@@ -1,42 +1,30 @@
-import { Router } from "express";
-import { UserProfileRoutes } from "../modules/user-profile/userProfile.route";
-import { AuthRoutes } from "../modules/auth/auth.route";
-import { BookingRoutes } from "../modules/booking/booking.route";
-import { UserRoutes } from "../modules/user/user.route";
-import { AdminRoutes } from "../modules/admin/admin.route";
-import { FLatRoutes } from "../modules/flat/flat.route";
-import { FlatShareRequestRoutes } from "../modules/flatRequest/flatRequest.route";
+import express from "express";
+import { UserRoutes } from "../modules/User/user.routes";
+import { FlatRoutes } from "../modules/Flat/flat.routes";
+import { AuthRoutes } from "../modules/Auth/auth.routes";
+import { FlatShareRoutes } from "../modules/FlatShare/flatShare.routes";
 
-
-const router = Router();
+const router = express.Router();
 
 const moduleRoutes = [
-    {
-        path:'/flat',
-        route: FLatRoutes
-    },
-    
-    {
-        path:'/',
-        route: AuthRoutes
-    },
-    {
-        path:'/',
-        route: BookingRoutes
-    },
-    {
-        path:'/user',
-        route: UserRoutes
-    },
-    {
-        path:'/admin',
-        route: AdminRoutes
-    },
-    {
-        path:'/flat-share',
-        route: FlatShareRequestRoutes
-    },
-]
+  {
+    path: "/",
+    route: UserRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
+  {
+    path: "/flats",
+    route: FlatRoutes,
+  },
+  {
+    path: "/",
+    route: FlatShareRoutes,
+  },
+];
 
-moduleRoutes.forEach(route => router.use(route.path, route.route));
-export default  router;
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
+
+export default router;

@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,88 +8,64 @@ datasource db {
 }
 
 model User {
-  id             String       @id  @default(uuid())
-  username       String    
-  email          String    @unique
-  password       String
-  profilePhoto  String?
-  role               UserRole
-  needPasswordChange Boolean    @default(true)
-  status             UserStatus @default(ACTIVE)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  admin              Admin?
-  flatRequests   FlatRequest[]
-  flat          Flat[]
+  id        String      @id @default(uuid())
+  username  String      @unique
+  email     String      @unique
+  password  String
+  status    UserStatus  @default(ACTIVATE)
+  role      UserRole    @default(USER)
+  flatShare FlatShare[]
+  flat      Flat[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-
-  // @@map("user")
+  @@map("users")
 }
-model Admin {
-  id             String       @id  @default(uuid())
-  username          String
-  email         String   @unique
-  profilePhoto  String?
-  contactNumber String?
-  isDeleted     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 
-  user User @relation(fields: [email], references: [email])
-
-}
 model Flat {
-  id             String       @id  @default(uuid())
-  location       String
-  description    String
-  rentAmount     Float
-  bedrooms       Int
-  amenities      String[]
-  photos      Photo[] 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  userId        String
+  id          String      @id @default(uuid())
+  location    String
+  description String
+  rentAmount  Float
+  bedrooms    Int
+  amenities   String[]
+  photos      String[]
+  postedBy    String
+  user        User        @relation(fields: [postedBy], references: [id])
+  requests    FlatShare[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  user          User      @relation(fields: [userId], references: [id])
-  flatRequest       FlatRequest[]
-}
-model Photo {
-  id      String    @id @default(uuid())
-  imageUrl String
-  flatId  String
-  flat    Flat   @relation(fields: [flatId], references: [id])
-}
-model FlatRequest {
-  id              String       @id  @default(uuid())
-  userId         String
-  flatId         String
-  status         RequestStatus @default(PENDING)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  user           User      @relation( fields: [userId], references: [id])
-  flat           Flat      @relation(fields: [flatId], references: [id])
+  @@map("flats")
 }
 
+model FlatShare {
+  id        String            @id @default(uuid())
+  flatId    String
+  userId    String
+  status    FlatRequestStatus @default(PENDING)
+  space     Int?
+  message   String?
+  flat      Flat              @relation(fields: [flatId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
-
-
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-
-
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  SELLER
-  USER
+  @@map("flat_shares")
 }
 
 enum UserStatus {
-  ACTIVE
-  BLOCKED
-  DELETED
+  ACTIVATE
+  DEACTIVATE
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum FlatRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

@@ -12,51 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
-const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
-const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+exports.AuthControllers = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const auth_service_1 = require("./auth.service");
-const login = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.AuthServices.logInUser(req.body);
-    const { refreshToken, accessToken, user } = result;
-    res.cookie('refreshToken', refreshToken, {
+const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
+const auth_services_1 = require("./auth.services");
+const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_services_1.AuthServices.loginUser(req.body);
+    res.cookie("refreshToken", result === null || result === void 0 ? void 0 : result.refreshToken, {
         secure: false,
-        httpOnly: true
+        httpOnly: true,
     });
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
         success: true,
-        message: 'User logged in successfully',
-        data: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            token: accessToken,
-        }
+        statusCode: http_status_1.default.OK,
+        message: "User logged in successfully",
+        data: result === null || result === void 0 ? void 0 : result.user,
     });
 }));
 const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { refreshToken } = req.cookies;
-    const result = yield auth_service_1.AuthServices.refreshToken(refreshToken);
+    var _a;
+    const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+    const result = yield auth_services_1.AuthServices.refreshToken(refreshToken);
     (0, sendResponse_1.default)(res, {
+        success: true,
         statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'Refresh token generated Successfully',
-        data: result
+        message: "Token generated successfully",
+        data: result,
     });
 }));
-const register = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.AuthServices.createUserIntoDB(req.body);
+const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_services_1.AuthServices.changePassword(req === null || req === void 0 ? void 0 : req.user, req === null || req === void 0 ? void 0 : req.body);
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.CREATED,
         success: true,
-        message: 'User registered successfully',
-        data: result
+        statusCode: 200,
+        message: "Password changed successfully",
+        data: result,
     });
 }));
-exports.AuthController = {
-    login,
+exports.AuthControllers = {
+    loginUser,
     refreshToken,
-    register
+    changePassword,
 };
